@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Define your dark theme styles here */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        /* Style for the table */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Resume Analyzer</h1>
+        <label for="dark-mode-toggle">Dark Mode</label>
+        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+        <form action="/" method="post" enctype="multipart/form-data">
+            <label for="job_description">Job Description:</label>
+            <textarea name="job_description" rows="4" cols="50" required></textarea>
+            <br>
+            <label for="resume_files">Upload Resumes (PDF):</label>
+            <input type="file" name="resume_files" accept=".pdf" multiple required>
+            <br>
+            <input type="submit" value="Analyze Resumes">
+        </form>
+
+        {% if results %}
+        <h2>Ranked Resumes:</h2>
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Similarity in %</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ result[0][0] }}</td>
+                <td>{{ result[1][0] }}</td>
+                <td>{{ result[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <a href="{{ url_for('download_csv') }}" download="ranked_resumes.csv" class="download-link">Download CSV</a>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+
+</html>
