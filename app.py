@@ -26,14 +26,18 @@ def extract_text_from_pdf(pdf_path):
 
 # Extract entities using spaCy NER
 def extract_entities(text):
-    emails = re.findall(r'\S+@\S+', text)
+    emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text)
+    # Truncate emails after .com
+    truncated_emails = [email.split('.com')[0] + '.com' for email in emails]
+    
     names = re.findall(r'^([A-Z][a-z]+)\s+([A-Z][a-z]+)', text)
     if names:
         names = [" ".join(names[0])]
-    return emails, names
+    return truncated_emails, names
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global results  # Declare results as global
     results = []
     if request.method == 'POST':
         job_description = request.form['job_description']
@@ -56,17 +60,15 @@ def index():
             processed_resumes.append((names, emails, resume_text))
 
         # TF-IDF vectorizer
-
-       # Extract job description features using TF-IDF
+        # Extract job description features using TF-IDF
         tfidf_vectorizer = TfidfVectorizer(max_df=1.0, stop_words='english')
         job_desc_vector = tfidf_vectorizer.fit_transform([job_description])
-
 
         # Rank resumes based on similarity
         ranked_resumes = []
         for (names, emails, resume_text) in processed_resumes:
             resume_vector = tfidf_vectorizer.transform([resume_text])
-            similarity = cosine_similarity(job_desc_vector, resume_vector)[0][0] * 100 
+            similarity = cosine_similarity(job_desc_vector, resume_vector)[0][0] * 100
             # Convert similarity to integer
             similarity = int(similarity)
             ranked_resumes.append((names, emails, similarity))
