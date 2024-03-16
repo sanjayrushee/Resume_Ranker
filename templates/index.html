@@ -17,10 +17,11 @@
         table {
             border-collapse: collapse;
             width: 100%;
+            margin-top: 20px;
         }
 
         th, td {
-            padding: 8px;
+            padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
@@ -32,14 +33,51 @@
         tr:hover {
             background-color: #f5f5f5;
         }
+
+        .container {
+            margin: auto;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #dark-mode-toggle {
+            display: none;
+        }
+
+        #dark-mode-toggle + label {
+            cursor: pointer;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        #dark-mode-toggle:checked + label {
+            background-color: #000;
+        }
+
+        .download-link {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .download-link:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Resume Analyzer</h1>
-        <label for="dark-mode-toggle">Dark Mode</label>
         <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+        <label for="dark-mode-toggle">Dark Mode</label>
         <form action="/" method="post" enctype="multipart/form-data">
             <label for="job_description">Job Description:</label>
             <textarea name="job_description" rows="4" cols="50" required></textarea>
@@ -53,22 +91,25 @@
         {% if results %}
         <h2>Ranked Resumes:</h2>
         <table>
-            <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Similarity in %</th>
-            </tr>
-            {% for result in results %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ result[0][0] }}</td>
-                <td>{{ result[1][0] }}</td>
-                <td>{{ result[2] }}</td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ result[0][0] }}</td>
+                    <td>{{ result[1][0] }}</td>
+                    <td>{{ result[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-        <br>
         <a href="{{ url_for('download_csv') }}" download="ranked_resumes.csv" class="download-link">Download CSV</a>
         {% endif %}
     </div>

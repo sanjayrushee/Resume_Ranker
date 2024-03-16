@@ -67,6 +67,8 @@ def index():
         for (names, emails, resume_text) in processed_resumes:
             resume_vector = tfidf_vectorizer.transform([resume_text])
             similarity = cosine_similarity(job_desc_vector, resume_vector)[0][0] * 100 
+            # Convert similarity to integer
+            similarity = int(similarity)
             ranked_resumes.append((names, emails, similarity))
 
         # Sort resumes by similarity score
