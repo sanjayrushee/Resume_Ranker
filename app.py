@@ -56,19 +56,14 @@ def index():
             processed_resumes.append((names, emails, resume_text))
 
         # TF-IDF vectorizer
-
-       # Extract job description features using TF-IDF
-        tfidf_vectorizer = TfidfVectorizer(max_df=1.0, stop_words='english')
+        tfidf_vectorizer = TfidfVectorizer()
         job_desc_vector = tfidf_vectorizer.fit_transform([job_description])
-
 
         # Rank resumes based on similarity
         ranked_resumes = []
         for (names, emails, resume_text) in processed_resumes:
             resume_vector = tfidf_vectorizer.transform([resume_text])
             similarity = cosine_similarity(job_desc_vector, resume_vector)[0][0] * 100 
-            # Convert similarity to integer
-            similarity = int(similarity)
             ranked_resumes.append((names, emails, similarity))
 
         # Sort resumes by similarity score
@@ -98,6 +93,8 @@ def download_csv():
     
     csv_full_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), csv_filename)
     return send_file(csv_full_path, as_attachment=True, download_name="ranked_resumes.csv")
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
